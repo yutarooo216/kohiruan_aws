@@ -1,6 +1,6 @@
 FROM public.ecr.aws/lambda/python:3.11
 
-# システムパッケージ（Playwright用）
+# 必要なシステムライブラリ
 RUN yum install -y \
     nss \
     atk \
@@ -14,9 +14,11 @@ RUN yum install -y \
     pango \
     alsa-lib
 
-# Pythonライブラリ
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# pip アップデート + Python ライブラリインストール
+RUN python -m pip install --upgrade pip
+RUN python -m pip install --no-cache-dir fastapi pydantic mangum playwright
+
+# Playwright Chromium インストール
 RUN python -m playwright install --with-deps chromium
 
 # アプリコード
