@@ -1,4 +1,5 @@
-FROM public.ecr.aws/lambda/python:3.11
+# Stage 1: ビルド環境
+FROM python:3.11-slim AS builder
 
 # 必要なシステムパッケージをインストール
 RUN apt-get update && apt-get install -y \
@@ -14,10 +15,16 @@ RUN apt-get update && apt-get install -y \
     libpango-1.0-0 \
     libasound2
 
-# ライブラリインストール
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt && \
-    python -m playwright install --with-deps chromium
+# Pythonライブラリをインストール
+COPY requirements.txt /tmp/
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
+
+# Stage 2: AWS Lambdaイメージ
+FROM public.ecr.aws/lambda/python:3.11
+
+# builderから必要なファイルをコピー
+COPY --from=builder /usr/lib /usr/lib
+COPY --from=builder /usr/local/lib/python3.11/site-packages /var/lang/lib/python3.11/site-packages
 
 # アプリコードコピー
 COPY app.py ${LAMBDA_TASK_ROOT}
