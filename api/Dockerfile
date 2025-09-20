@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Pythonライブラリをインストール
-RUN pip install --no-cache-dir fastapi uvicorn[standard] mangum playwright aws-lambda-runtime-interface-client \
+RUN pip install --no-cache-dir fastapi uvicorn[standard] mangum playwright \
     && playwright install --with-deps chromium
 
 # 作業ディレクトリを設定
