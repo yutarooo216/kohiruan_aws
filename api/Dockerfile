@@ -1,27 +1,23 @@
-FROM public.ecr.aws/lambda/python:3.11
+FROM python:3.11-slim
 
-# 必要なシステムライブラリ
-RUN yum install -y \
-    nss \
-    atk \
-    atk-bridge \
-    cups-libs \
-    libXcomposite \
-    libXrandr \
-    libXdamage \
-    libxkbcommon \
-    mesa-libgbm \
-    pango \
-    alsa-lib
+# 必要なシステムパッケージをインストール
+RUN apt-get update && apt-get install -y \
+    wget curl unzip fonts-liberation libnss3 libatk-bridge2.0-0 libxss1 libasound2 libx11-xcb1 libgtk-3-0 \
+    && rm -rf /var/lib/apt/lists/*
 
-# pip アップデート + Python ライブラリインストール
-RUN python -m pip install --upgrade pip
-RUN python -m pip install --no-cache-dir fastapi pydantic mangum playwright
+# Pythonライブラリをインストール
+RUN pip install --no-cache-dir fastapi uvicorn[standard] mangum playwright aws-lambda-runtime-interface-client \
+    && playwright install --with-deps chromium
 
-# Playwright Chromium インストール
-RUN python -m playwright install --with-deps chromium
+# 作業ディレクトリを設定
+WORKDIR /var/task
 
-# アプリコード
-COPY app.py ${LAMBDA_TASK_ROOT}
+# アプリケーションコードをコピー
+COPY . .
 
-CMD ["app.handler"]
+# Lambdaのエントリーポイントスクリプトをコピー
+COPY bootstrap /var/runtime/bootstrap
+RUN chmod +x /var/runtime/bootstrap
+
+# エントリーポイントを設定
+ENTRYPOINT ["/var/runtime/bootstrap"]
