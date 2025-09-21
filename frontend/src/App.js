@@ -3,7 +3,7 @@ import { InputField } from './component/InputField.tsx';
 import { ReserveTimeComponent } from './component/ReserveTimeComponent.tsx';
 import axios from 'axios';
 
-const API_URL = `${process.env.REACT_APP_API_URL}/test/`;
+const API_URL = `${process.env.REACT_APP_API_URL}/`;
 
 export const App = () => {
   const [reserveDate, setReserveDate] = useState('');
