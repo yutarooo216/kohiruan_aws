@@ -2,12 +2,14 @@ FROM node:18
 
 WORKDIR /app
 
+# パッケージファイルをコピー
 COPY package.json package-lock.json* ./
 
+# npm installを実行
 RUN npm install
 
+# ソースコードをコピー
 COPY . .
 
-EXPOSE 3000
-
-CMD ["npm", "start"]
+# ビルドコマンドを実行
+RUN npm run build

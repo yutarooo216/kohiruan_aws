@@ -17,9 +17,9 @@ resource "aws_apigatewayv2_route" "main" {
 }
 
 resource "aws_apigatewayv2_stage" "main" {
-    api_id      = aws_apigatewayv2_api.main.id
-    name        = "$default"
-    auto_deploy = true
+  api_id      = aws_apigatewayv2_api.main.id
+  name        = "$default"
+  auto_deploy = true
   default_route_settings {
     throttling_burst_limit = 1000
     throttling_rate_limit  = 500
@@ -31,12 +31,12 @@ resource "aws_apigatewayv2_stage" "main" {
 }
 
 resource "aws_apigatewayv2_integration" "main" {
-  api_id             = aws_apigatewayv2_api.main.id
-  integration_type   = "AWS_PROXY"
-  integration_uri    = aws_lambda_function.main.invoke_arn
+  api_id                 = aws_apigatewayv2_api.main.id
+  integration_type       = "AWS_PROXY"
+  integration_uri        = aws_lambda_function.main.invoke_arn
   payload_format_version = "2.0"
-  integration_method = "POST"
-  connection_type    = "INTERNET"
+  integration_method     = "POST"
+  connection_type        = "INTERNET"
 }
 
 resource "aws_lambda_permission" "apigateway" {
