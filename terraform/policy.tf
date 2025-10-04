@@ -14,17 +14,24 @@ resource "aws_iam_role" "lambda_exec" {
 
 # Lambda に S3 への Put, Get のみ許可するポリシー
 resource "aws_iam_policy" "lambda_s3" {
-  name        = "lambda-s3-write-only"
-  description = "Allow Lambda to put objects in S3 bucket"
+  name        = "lambda-s3-access"
+  description = "Allow Lambda to list, get, and put objects in the S3 bucket"
   policy = jsonencode({
-    Version = "2012-10-17"
+    Version = "2012-10-17",
     Statement = [
       {
-        Effect = "Allow"
+        Effect = "Allow",
         Action = [
-          "s3:PutObject",
-          "s3:GetObject"
-        ]
+          "s3:ListBucket"
+        ],
+        Resource = "arn:aws:s3:::kohiruan-reservation"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject"
+        ],
         Resource = "arn:aws:s3:::kohiruan-reservation/*"
       }
     ]
@@ -91,6 +98,7 @@ resource "aws_iam_role_policy" "scheduler_policy" {
   })
 }
 
+# log用のポリシーをアタッチ
 resource "aws_iam_role_policy_attachment" "lambda_logging" {
   role       = aws_iam_role.lambda_exec.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
