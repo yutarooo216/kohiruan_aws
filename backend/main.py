@@ -1,43 +1,26 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
 from playwright.sync_api import sync_playwright
-from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
-import logging
+import sys
+import boto3
+import json
+import os
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+def load_request_from_s3():
+    s3_path = os.environ["S3_JSON_PATH"]
+    bucket, key = s3_path.replace("s3://", "").split("/", 1)
 
-app = FastAPI()
+    s3 = boto3.client("s3")
+    obj = s3.get_object(Bucket=bucket, Key=key)
+    data = json.loads(obj["Body"].read().decode("utf-8"))
 
-# 許可するオリジン（ReactのURL）
-origins = [
-    "http://localhost:3000",  # Reactのデフォルト開発サーバーURL
-]
+    return data
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# リクエストボディの定義
-class ReservationRequest(BaseModel):
-    reserveDate: str
-    reserveTime: str
-    lastName: str
-    firstName: str
-    lastNameKn: str
-    firstNameKn: str
-    email: str
-    tel: str  
-
-@app.post("/test")
-def access_airrsv(request: ReservationRequest):
+def main():
     with sync_playwright() as p:
         try:
+            # s3からリクエストデータを取得
+            request = load_request_from_s3()
+
             browser = p.chromium.launch(headless=True)
             page = browser.new_page()
 
@@ -152,8 +135,11 @@ def access_airrsv(request: ReservationRequest):
             return {"current_url": current_url}
     
         except Exception as e:
-            logger.error(f"エラーが発生しました: {e}")
+            print(f"エラーが発生しました: {e}")
             return {"error": str(e)}
         
         finally:
             browser.close()
+
+if __name__ == "__main__":
+    main()

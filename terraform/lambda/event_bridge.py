@@ -23,16 +23,10 @@ def lambda_handler(event, context):
     for key in json_files:
         print(f" - {key}")
 
-    # 3. 各JSONファイルを読み込んで中身をprint
+    # 3. 各JSONファイルを読み込んでecsタスクを起動
     for key in json_files:
-        obj = s3.get_object(Bucket=BUCKET_NAME, Key=key)
-        body = obj['Body'].read().decode('utf-8')
-        try:
-            data = json.loads(body)
-            print(f"Contents of {key}:")
-            print(json.dumps(data, indent=2, ensure_ascii=False))
-        except json.JSONDecodeError:
-            print(f"⚠️ {key} is not valid JSON:")
-            print(body)
+        s3_uri = f"s3://{BUCKET_NAME}/{key}"
+        
+        # ecsタスク起動
 
-    return {"status": "done", "file_count": len(json_files)}
+    return {"status": "done"}

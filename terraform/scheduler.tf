@@ -1,10 +1,10 @@
 # =========================
-# Scheduler定義（1分ごと）
+# Scheduler定義
 # =========================
 resource "aws_scheduler_schedule" "scheduler" {
   name                         = "lambda-every-minute"
   schedule_expression_timezone = "Asia/Tokyo"
-  schedule_expression          = "cron(30 22 4 10 ? 2025)"
+  schedule_expression          = "cron(49 05 5 10 ? 2025)"
 
   flexible_time_window {
     mode = "OFF"

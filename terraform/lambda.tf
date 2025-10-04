@@ -17,4 +17,5 @@ resource "aws_lambda_function" "worker" {
   handler       = "event_bridge.lambda_handler"
   runtime       = "python3.12"
   filename      = "lambda/event_bridge.zip"
+  source_code_hash = filebase64sha256("lambda/event_bridge.zip")
 }
