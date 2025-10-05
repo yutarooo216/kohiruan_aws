@@ -21,7 +21,11 @@ def load_request_from_s3():
 
     s3 = boto3.client("s3")
     obj = s3.get_object(Bucket=bucket, Key=key)
-    print("S3 object retrieved")
+    print("S3 object metadata:", obj.keys())
+    print("ContentLength:", obj["ContentLength"])
+
+    body = obj["Body"].read()
+    print("Raw body bytes:", body)
 
     data = json.loads(obj["Body"].read().decode("utf-8"))
     print("JSON loaded successfully")
