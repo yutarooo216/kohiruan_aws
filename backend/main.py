@@ -63,7 +63,7 @@ def main():
                 return {"error": f"{request['reserveDate']} の日付が見つかりません"}
 
             # 監視ループ開始
-            max_retry = 300
+            max_retry = 90
             interval_sec = 1
 
             for attempt in range(max_retry):

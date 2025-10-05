@@ -4,8 +4,7 @@
 resource "aws_scheduler_schedule" "scheduler" {
   name                         = "lambda-every-minute"
   schedule_expression_timezone = "Asia/Tokyo"
-  # schedule_expression          = "cron(56 20 ? * FRI,SAT *)"
-  schedule_expression          = "cron(15 14 5 10 ? 2025)"
+  schedule_expression          = "cron(58 20 ? * FRI,SAT *)"
 
   flexible_time_window {
     mode = "OFF"
