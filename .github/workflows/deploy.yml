@@ -31,5 +31,6 @@ jobs:
           ECR_REPOSITORY=my-lambda-app
           IMAGE_TAG=latest
 
+          ls -l ./backend
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./backend
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG

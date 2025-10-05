@@ -8,4 +8,6 @@ RUN pip install --no-cache-dir boto3 playwright
 
 WORKDIR /app
 
+COPY main.py .
+
 CMD ["python", "main.py"]

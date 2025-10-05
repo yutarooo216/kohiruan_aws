@@ -75,4 +75,4 @@ def run_fargate_task(s3_uri: str):
         return response
     except Exception as e:
         print(f"Error running Fargate task: {e}")
-        raise e
+        return e
