@@ -48,7 +48,7 @@ def main():
 
             if target_index is None:
                 browser.close()
-                return {"error": f"{request["reserveDate"]} の日付が見つかりません"}
+                return {"error": f"{request['reserveDate']} の日付が見つかりません"}
 
             # 監視ループ開始
             max_retry = 60
@@ -99,7 +99,7 @@ def main():
 
             if not found:
                 browser.close()
-                return {"error": f"{request["reserveDate"]} {request["reserveTime"]} の予約枠は見つかりませんでした"}
+                return {"error": f"{request['reserveDate']} {request['reserveTime']} の予約枠は見つかりませんでした"}
 
             # 入力部分
             page.fill('input[name="lastNm"]', request["lastName"])
