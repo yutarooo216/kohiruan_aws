@@ -1,11 +1,23 @@
 import datetime
 import boto3
 import json
+import os
 
+# s3
 s3 = boto3.client('s3')
 # BUCKET_NAME = os.environ.get("BUCKET_NAME", "my-request-bucket")
 BUCKET_NAME = 'kohiruan-reservation'
 
+# ecsタスク起動
+ecs_client = boto3.client('ecs')
+import os
+
+CLUSTER_NAME = os.environ["ECS_CLUSTER_NAME"]
+TASK_DEFINITION = os.environ["TASK_DEFINITION"]
+SUBNETS = os.environ["SUBNETS"].split(",")
+SECURITY_GROUPS = os.environ["SECURITY_GROUPS"].split(",")
+
+# handler
 def lambda_handler(event, context):
     print("Lambda triggered")
 
@@ -28,5 +40,39 @@ def lambda_handler(event, context):
         s3_uri = f"s3://{BUCKET_NAME}/{key}"
         
         # ecsタスク起動
+        response = run_fargate_task(s3_uri)
 
-    return {"status": "done"}
+    return {"status": response}
+
+def run_fargate_task(s3_uri: str):
+    try:
+        response = ecs_client.run_task(
+            cluster=CLUSTER_NAME,
+            launchType='FARGATE',
+            taskDefinition=TASK_DEFINITION,
+            count=1,
+            networkConfiguration={
+                'awsvpcConfiguration': {
+                    'subnets': SUBNETS,
+                    'securityGroups': SECURITY_GROUPS,
+                    'assignPublicIp': 'ENABLED'
+                }
+            },
+            overrides={
+                'containerOverrides': [
+                    {
+                        'name': 'playwright-container',  # タスク定義のコンテナ名
+                        'environment': [
+                            {
+                                'name': 'S3_JSON_PATH',
+                                'value': s3_uri
+                            }
+                        ]
+                    }
+                ]
+            }
+        )
+        return response
+    except Exception as e:
+        print(f"Error running Fargate task: {e}")
+        raise e

@@ -18,4 +18,13 @@ resource "aws_lambda_function" "worker" {
   runtime       = "python3.12"
   filename      = "lambda/event_bridge.zip"
   source_code_hash = filebase64sha256("lambda/event_bridge.zip")
+
+  environment {
+    variables = {
+      ECS_CLUSTER_NAME = aws_ecs_cluster.playwright.name
+      TASK_DEFINITION  = aws_ecs_task_definition.playwright.family
+      SUBNETS          = join(",", [aws_subnet.public.id])
+      SECURITY_GROUPS  = join(",", [aws_security_group.ecs_sg.id])
+    }
+  }
 }
