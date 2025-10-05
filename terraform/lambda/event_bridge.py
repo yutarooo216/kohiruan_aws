@@ -72,7 +72,11 @@ def run_fargate_task(s3_uri: str):
                 ]
             }
         )
-        return response
+        # JSON シリアライズ可能な情報だけ返す
+        return {
+            "tasks": [t["taskArn"] for t in response.get("tasks", [])],
+            "failures": response.get("failures", [])
+        }
     except Exception as e:
         print(f"Error running Fargate task: {e}")
-        return e
+        return {"error": str(e)}

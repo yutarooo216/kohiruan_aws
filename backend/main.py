@@ -105,7 +105,7 @@ def main():
             page.fill('input[name="lastNm"]', request["lastName"])
             page.fill('input[name="firstNm"]', request["firstName"])
             page.fill('input[name="lastNmKn"]', request["lastNameKn"])
-            page.fill('input[name="firstNmKn"]', request["firstNameK"])
+            page.fill('input[name="firstNmKn"]', request["firstNameKn"])
             page.fill('input[name="mailAddress1"]', request["email"])
             page.fill('input[name="mailAddress1ForCnfrm"]', request["email"])
             page.fill('input[name="tel1"]', request["tel"])

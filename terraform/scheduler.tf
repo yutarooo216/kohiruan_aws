@@ -4,7 +4,7 @@
 resource "aws_scheduler_schedule" "scheduler" {
   name                         = "lambda-every-minute"
   schedule_expression_timezone = "Asia/Tokyo"
-  schedule_expression          = "cron(46 12 5 10 ? 2025)"
+  schedule_expression          = "cron(05 13 5 10 ? 2025)"
 
   flexible_time_window {
     mode = "OFF"
@@ -13,6 +13,10 @@ resource "aws_scheduler_schedule" "scheduler" {
   target {
     arn      = aws_lambda_function.worker.arn
     role_arn = aws_iam_role.scheduler_role.arn
+
+    retry_policy {
+      maximum_retry_attempts = 0
+    }
   }
 }
 
