@@ -6,29 +6,18 @@ import json
 import os
 
 def load_request_from_s3():
-    s3_path = os.environ.get("S3_JSON_PATH")
-    print("S3_JSON_PATH:", s3_path)
-
-    if not s3_path:
-        raise ValueError("S3_JSON_PATH is not set")
-
-    bucket_key = s3_path.replace("s3://", "").split("/", 1)
-    if len(bucket_key) != 2:
-        raise ValueError(f"Invalid S3 path: {s3_path}")
-
-    bucket, key = bucket_key
-    print("Bucket:", bucket, "Key:", key)
+    s3_path = os.environ["S3_JSON_PATH"]
+    bucket, key = s3_path.replace("s3://", "").split("/", 1)
 
     s3 = boto3.client("s3")
     obj = s3.get_object(Bucket=bucket, Key=key)
-    print("S3 object metadata:", obj.keys())
-    print("ContentLength:", obj["ContentLength"])
+    body_bytes = obj["Body"].read()
 
-    body = obj["Body"].read()
-    print("Raw body bytes:", body)
+    # 前後の空白や改行を strip してからデコード
+    body_str = body_bytes.decode("utf-8").strip()
+    data = json.loads(body_str)
 
-    data = json.loads(obj["Body"].read().decode("utf-8"))
-    print("JSON loaded successfully")
+    print("Loaded JSON:", data)
     return data
 
 def main():
