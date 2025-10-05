@@ -15,7 +15,7 @@ resource "aws_iam_role" "lambda_exec" {
 # Lambda に S3 への Put, Get のみ許可するポリシー
 resource "aws_iam_policy" "lambda_s3" {
   name        = "lambda-s3-access"
-  description = "Allow Lambda to list, get, and put objects in the S3 bucket"
+  description = "Allow Lambda to list, get, put, and delete objects in the S3 bucket"
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -30,7 +30,8 @@ resource "aws_iam_policy" "lambda_s3" {
         Effect = "Allow",
         Action = [
           "s3:GetObject",
-          "s3:PutObject"
+          "s3:PutObject",
+          "s3:DeleteObject"   # ここを追加
         ],
         Resource = "arn:aws:s3:::kohiruan-reservation/*"
       }

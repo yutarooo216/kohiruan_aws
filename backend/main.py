@@ -20,6 +20,18 @@ def load_request_from_s3():
     print("Loaded JSON:", data)
     return data
 
+def delete_s3_file():
+    # s3://bucket/key の形式を分解
+    s3_path = os.environ["S3_JSON_PATH"]
+    bucket, key = s3_path.replace("s3://", "").split("/", 1)
+
+    s3 = boto3.client("s3")
+    try:
+        s3.delete_object(Bucket=bucket, Key=key)
+        print(f"Deleted {s3_path} from S3")
+    except Exception as e:
+        print(f"Failed to delete {s3_path}: {e}")
+
 def main():
     with sync_playwright() as p:
         try:
@@ -51,7 +63,7 @@ def main():
                 return {"error": f"{request['reserveDate']} の日付が見つかりません"}
 
             # 監視ループ開始
-            max_retry = 60
+            max_retry = 300
             interval_sec = 1
 
             for attempt in range(max_retry):
@@ -126,6 +138,7 @@ def main():
                     print("予約確定ボタンをクリックしました")
                 except Exception as e:
                     print(f"予約確定ボタンのクリック時に例外発生: {e}")
+                delete_s3_file()
             else:
                 print("予約確定ボタンが見つかりませんでした")
 
@@ -133,8 +146,8 @@ def main():
             print(current_url)
 
             html_content = page.content()
-            with open("page_content.html", "w", encoding="utf-8") as file:
-                file.write(html_content)
+            # with open("page_content.html", "w", encoding="utf-8") as file:
+            #     file.write(html_content)
 
             browser.close()
             return {"current_url": current_url}
