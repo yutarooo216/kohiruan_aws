@@ -6,13 +6,25 @@ import json
 import os
 
 def load_request_from_s3():
-    s3_path = os.environ["S3_JSON_PATH"]
-    bucket, key = s3_path.replace("s3://", "").split("/", 1)
+    s3_path = os.environ.get("S3_JSON_PATH")
+    print("S3_JSON_PATH:", s3_path)
+
+    if not s3_path:
+        raise ValueError("S3_JSON_PATH is not set")
+
+    bucket_key = s3_path.replace("s3://", "").split("/", 1)
+    if len(bucket_key) != 2:
+        raise ValueError(f"Invalid S3 path: {s3_path}")
+
+    bucket, key = bucket_key
+    print("Bucket:", bucket, "Key:", key)
 
     s3 = boto3.client("s3")
     obj = s3.get_object(Bucket=bucket, Key=key)
-    data = json.loads(obj["Body"].read().decode("utf-8"))
+    print("S3 object retrieved")
 
+    data = json.loads(obj["Body"].read().decode("utf-8"))
+    print("JSON loaded successfully")
     return data
 
 def main():
