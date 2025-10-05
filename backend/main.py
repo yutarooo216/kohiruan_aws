@@ -36,19 +36,19 @@ def main():
             # ヘッダーから日付のindexを取得
             header_tds = page.query_selector_all("td.scheduleHeader--day")
             target_index = None
-            dt = datetime.strptime(request.reserveDate, "%Y-%m-%d")
-            request.reserveDate = f"{dt.month}/{dt.day}"
+            dt = datetime.strptime(request["reserveDate"], "%Y-%m-%d")
+            request["reserveDate"] = f"{dt.month}/{dt.day}"
             for i, td in enumerate(header_tds):
                 span = td.query_selector("span")
                 if not span:
                     continue
-                if span.inner_text().strip() == request.reserveDate:
+                if span.inner_text().strip() == request["reserveDate"]:
                     target_index = i
                     break
 
             if target_index is None:
                 browser.close()
-                return {"error": f"{request.reserveDate} の日付が見つかりません"}
+                return {"error": f"{request["reserveDate"]} の日付が見つかりません"}
 
             # 監視ループ開始
             max_retry = 60
@@ -68,7 +68,7 @@ def main():
                     time_span = lane.query_selector("dt.dataFromTime > span:last-child")
                     if time_span is None:
                         continue
-                    if time_span.inner_text().strip() == request.reserveTime:
+                    if time_span.inner_text().strip() == request["reserveTime"]:
                         clickable = lane.query_selector("a.dataLinkBox.js-dataLinkBox")
                         if clickable:
                             clickable.click()
@@ -99,16 +99,16 @@ def main():
 
             if not found:
                 browser.close()
-                return {"error": f"{request.reserveDate} {request.reserveTime} の予約枠は見つかりませんでした"}
+                return {"error": f"{request["reserveDate"]} {request["reserveTime"]} の予約枠は見つかりませんでした"}
 
             # 入力部分
-            page.fill('input[name="lastNm"]', request.lastName)
-            page.fill('input[name="firstNm"]', request.firstName)
-            page.fill('input[name="lastNmKn"]', request.lastNameKn)
-            page.fill('input[name="firstNmKn"]', request.firstNameKn)
-            page.fill('input[name="mailAddress1"]', request.email)
-            page.fill('input[name="mailAddress1ForCnfrm"]', request.email)
-            page.fill('input[name="tel1"]', request.tel)
+            page.fill('input[name="lastNm"]', request["lastName"])
+            page.fill('input[name="firstNm"]', request["firstName"])
+            page.fill('input[name="lastNmKn"]', request["lastNameKn"])
+            page.fill('input[name="firstNmKn"]', request["firstNameK"])
+            page.fill('input[name="mailAddress1"]', request["email"])
+            page.fill('input[name="mailAddress1ForCnfrm"]', request["email"])
+            page.fill('input[name="tel1"]', request["tel"])
 
             # クリック
             button = page.query_selector("button.btn.is-primary")
